@@ -1,0 +1,180 @@
+// Instagram Unfollow Script - Optimized Version
+// Configuration
+const UNFOLLOW_LIMIT = 800;              // Maximum accounts to unfollow in one session
+const UNFOLLOW_INTERVAL = 1000;          // 1 second between unfollows to avoid detection
+const BREAK_DURATION = 5 * 60 * 1000;    // 5 minutes break
+const TOTAL_DURATION = 10 * 60 * 1000;   // 10 minutes duration
+const TIMEOUT_DURATION = 10000;          // 10 seconds timeout for waiting operations
+
+// Control variables
+let stopScript = false;
+let unfollowedCount = 0;
+let skippedCount = 0;
+
+// Helper functions
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Function to find a button by text content with retry mechanism
+const findButton = async (txt, maxRetries = 3, retryDelay = 500) => {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const buttons = [...document.querySelectorAll("button")].filter(btn => 
+      btn.innerText === txt || 
+      btn.textContent === txt ||
+      (btn.querySelector('div') && btn.querySelector('div').textContent === txt)
+    );
+    
+    if (buttons.length > 0) {
+      return buttons[0];
+    }
+    
+    // Wait before retrying
+    if (attempt < maxRetries - 1) {
+      await delay(retryDelay);
+    }
+  }
+  return null;
+};
+
+// Function to wait for an element with timeout
+const waitForElement = async (findFn, timeoutMs = TIMEOUT_DURATION) => {
+  const startTime = Date.now();
+  let element = findFn();
+  
+  while (!element && Date.now() - startTime < timeoutMs) {
+    await delay(100);
+    element = findFn();
+  }
+  
+  return element;
+};
+
+// Function to perform a single unfollow action with proper waiting and error handling
+const unfollowSingle = async () => {
+  try {
+    // Find and click "Following" button
+    const followingButton = await waitForElement(() => findButton("Following"));
+    if (!followingButton) {
+      console.log("No Following button found within timeout period");
+      return false;
+    }
+    
+    // Make sure the button is visible
+    followingButton.scrollIntoView({ behavior: "smooth", block: "center" });
+    await delay(300); // Wait for scroll to complete
+    
+    // Click the Following button
+    followingButton.click();
+    await delay(500); // Wait for dialog to appear
+    
+    // Find and click "Unfollow" confirmation button
+    const unfollowButton = await waitForElement(() => findButton("Unfollow"));
+    if (!unfollowButton) {
+      console.log("No Unfollow confirmation button found within timeout period");
+      return false;
+    }
+    
+    unfollowButton.click();
+    await delay(500); // Wait for unfollow action to complete
+    
+    return true;
+  } catch (error) {
+    console.error("Error during unfollow process:", error);
+    return false;
+  }
+};
+
+// Function to scroll to load more following entries
+const scrollToLoadMore = async () => {
+  const followingList = document.querySelector('div[role="dialog"] div[style*="overflow"]') || 
+                         document.querySelector('div[role="dialog"] div[style*="overflow-y"]');
+  
+  if (followingList) {
+    const previousHeight = followingList.scrollHeight;
+    followingList.scrollTop = followingList.scrollHeight;
+    await delay(1500); // Wait for content to load
+    
+    // Check if we've loaded new content
+    return followingList.scrollHeight > previousHeight;
+  }
+  return false;
+};
+
+// Main function to unfollow users
+const unfollowUsers = async () => {
+  console.log("➡️ Starting Instagram unfollow script");
+  console.log(`⚙️ Settings: Limit=${UNFOLLOW_LIMIT}, Interval=${UNFOLLOW_INTERVAL}ms, Total Duration=${TOTAL_DURATION/60000}min`);
+  
+  let startTime = new Date().getTime();
+  unfollowedCount = 0;
+  skippedCount = 0;
+
+  // Setup keyboard listener to stop script
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      console.log("🛑 ESC key pressed - Stopping script...");
+      stopScript = true;
+    }
+  });
+  
+  // Display progress info periodically
+  const progressInterval = setInterval(() => {
+    if (stopScript) {
+      clearInterval(progressInterval);
+      return;
+    }
+    const elapsedMinutes = Math.floor((new Date().getTime() - startTime) / 60000);
+    console.log(`📊 Progress: Unfollowed ${unfollowedCount}, Skipped ${skippedCount}, Running for ${elapsedMinutes} minutes`);
+  }, 30000);
+
+  try {
+    while (new Date().getTime() - startTime < TOTAL_DURATION && !stopScript && unfollowedCount < UNFOLLOW_LIMIT) {
+      // Try to unfollow
+      const success = await unfollowSingle();
+      
+      if (success) {
+        unfollowedCount++;
+        console.log(`✅ Unfollowed #${unfollowedCount}`);
+        await delay(UNFOLLOW_INTERVAL);
+      } else {
+        skippedCount++;
+        
+        // Try scrolling to load more if we can't find buttons
+        const loadedMore = await scrollToLoadMore();
+        if (!loadedMore) {
+          console.log("⚠️ No more accounts to unfollow or need to scroll down");
+          await delay(2000);
+        }
+      }
+      
+      // Take a break if needed
+      if (unfollowedCount > 0 && unfollowedCount % 50 === 0) {
+        const breakMinutes = BREAK_DURATION / 60000;
+        console.log(`🕒 Taking a break for ${breakMinutes} minutes to avoid rate limits...`);
+        await delay(BREAK_DURATION);
+        
+        if (!stopScript) {
+          console.log("▶️ Resuming unfollowing");
+        }
+      }
+    }
+  } catch (error) {
+    console.error("❌ Script error:", error);
+  } finally {
+    clearInterval(progressInterval);
+    
+    const totalElapsedMinutes = Math.floor((new Date().getTime() - startTime) / 60000);
+    console.log(`
+🏁 Script finished:
+- Total unfollowed: ${unfollowedCount}
+- Total skipped: ${skippedCount}
+- Running time: ${totalElapsedMinutes} minutes
+- Status: ${stopScript ? 'Stopped by user' : 'Completed naturally'}
+    `);
+  }
+};
+
+// Run the script
+unfollowUsers();
+
+// To stop the script, press ESC key or type stopScript = true in the console
+console.log("💡 Tip: Press ESC key or type stopScript = true in console to stop the script");
