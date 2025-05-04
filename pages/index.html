@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Unfollow Script</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #405DE6;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .copy-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 25px 0;
+        }
+        .copy-btn {
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+        .success-message {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+        .instructions {
+            margin-top: 30px;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .code-container {
+            position: absolute;
+            left: -9999px;
+            height: 0;
+            opacity: 0;
+        }
+        .steps-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .step {
+            flex-basis: 48%;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #405DE6;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        @media (max-width: 768px) {
+            .step {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Instagram Unfollow Tool</h1>
+        <p class="tagline">Easily manage your Instagram following list</p>
+    </header>
+
+    <div class="container">
+        <div class="copy-container">
+            <h2>Get the Script</h2>
+            <button id="copyBtn" class="copy-btn">Copy Script to Clipboard</button>
+            <span id="successMessage" class="success-message">✓ Script copied to clipboard!</span>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Disclaimer:</strong> This script is provided for educational purposes only. Use of automated scripts may violate Instagram's Terms of Service. Use at your own risk.
+        </div>
+
+        <div class="instructions">
+            <h2>How to Use</h2>
+            <ol>
+                <li>Click the button above to copy the script</li>
+                <li>Log in to your Instagram account</li>
+                <li>Go to your profile and click on "Following"</li>
+                <li>Open your browser's developer console:
+                    <ul>
+                        <li>Chrome/Edge: Press F12 or right-click > Inspect > Console</li>
+                        <li>Firefox: Press F12 or right-click > Inspect Element > Console</li>
+                        <li>Safari: Enable developer tools in Preferences > Advanced, then press Command+Option+C</li>
+                    </ul>
+                </li>
+                <li>Paste the script into the console and press Enter</li>
+                <li>The script will automatically start unfollowing accounts</li>
+                <li>To stop the script at any time, press the ESC key</li>
+            </ol>
+        </div>
+
+        <div class="steps-container">
+            <div class="step">
+                <h3>Features</h3>
+                <ul>
+                    <li>Unfollows accounts automatically</li>
+                    <li>Takes breaks to avoid triggering Instagram limits</li>
+                    <li>Shows real-time progress in the console</li>
+                    <li>Easy to stop with ESC key</li>
+                </ul>
+            </div>
+            <div class="step">
+                <h3>Customization</h3>
+                <p>You can modify these values at the top of the script:</p>
+                <ul>
+                    <li><strong>UNFOLLOW_LIMIT</strong>: Maximum accounts to unfollow</li>
+                    <li><strong>UNFOLLOW_INTERVAL</strong>: Time between unfollows (ms)</li>
+                    <li><strong>BREAK_DURATION</strong>: Break duration (ms)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Instagram Unfollow Tool | Not affiliated with Instagram or Meta</p>
+    </footer>
+
+    <!-- Hidden textarea for copying the code -->
+    <textarea id="codeText" class="code-container"></textarea>
+
+    <script>
+        // The Instagram unfollow script
+        const instagramUnfollowScript = `// Instagram Unfollow Script - Optimized Version
+// Configuration
+const UNFOLLOW_LIMIT = 800;              // Maximum accounts to unfollow in one session
+const UNFOLLOW_INTERVAL = 1000;          // 1 second between unfollows to avoid detection
+const BREAK_DURATION = 5 * 60 * 1000;    // 5 minutes break
+const TOTAL_DURATION = 10 * 60 * 1000;   // 10 minutes duration
+const TIMEOUT_DURATION = 10000;          // 10 seconds timeout for waiting operations
+
+// Control variables
+let stopScript = false;
+let unfollowedCount = 0;
+let skippedCount = 0;
+
+// Helper functions
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Function to find a button by text content with retry mechanism
+const findButton = async (txt, maxRetries = 3, retryDelay = 500) => {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const buttons = [...document.querySelectorAll("button")].filter(btn => 
+      btn.innerText === txt || 
+      btn.textContent === txt ||
+      (btn.querySelector('div') && btn.querySelector('div').textContent === txt)
+    );
+    
+    if (buttons.length > 0) {
+      return buttons[0];
+    }
+    
+    // Wait before retrying
+    if (attempt < maxRetries - 1) {
+      await delay(retryDelay);
+    }
+  }
+  return null;
+};
+
+// Function to wait for an element with timeout
+const waitForElement = async (findFn, timeoutMs = TIMEOUT_DURATION) => {
+  const startTime = Date.now();
+  let element = findFn();
+  
+  while (!element && Date.now() - startTime < timeoutMs) {
+    await delay(100);
+    element = findFn();
+  }
+  
+  return element;
+};
+
+// Function to perform a single unfollow action with proper waiting and error handling
+const unfollowSingle = async () => {
+  try {
+    // Find and click "Following" button
+    const followingButton = await waitForElement(() => findButton("Following"));
+    if (!followingButton) {
+      console.log("No Following button found within timeout period");
+      return false;
+    }
+    
+    // Make sure the button is visible
+    followingButton.scrollIntoView({ behavior: "smooth", block: "center" });
+    await delay(300); // Wait for scroll to complete
+    
+    // Click the Following button
+    followingButton.click();
+    await delay(500); // Wait for dialog to appear
+    
+    // Find and click "Unfollow" confirmation button
+    const unfollowButton = await waitForElement(() => findButton("Unfollow"));
+    if (!unfollowButton) {
+      console.log("No Unfollow confirmation button found within timeout period");
+      return false;
+    }
+    
+    unfollowButton.click();
+    await delay(500); // Wait for unfollow action to complete
+    
+    return true;
+  } catch (error) {
+    console.error("Error during unfollow process:", error);
+    return false;
+  }
+};
+
+// Function to scroll to load more following entries
+const scrollToLoadMore = async () => {
+  const followingList = document.querySelector('div[role="dialog"] div[style*="overflow"]') || 
+                         document.querySelector('div[role="dialog"] div[style*="overflow-y"]');
+  
+  if (followingList) {
+    const previousHeight = followingList.scrollHeight;
+    followingList.scrollTop = followingList.scrollHeight;
+    await delay(1500); // Wait for content to load
+    
+    // Check if we've loaded new content
+    return followingList.scrollHeight > previousHeight;
+  }
+  return false;
+};
+
+// Main function to unfollow users
+const unfollowUsers = async () => {
+  console.log("➡️ Starting Instagram unfollow script");
+  console.log(\`⚙️ Settings: Limit=\${UNFOLLOW_LIMIT}, Interval=\${UNFOLLOW_INTERVAL}ms, Total Duration=\${TOTAL_DURATION/60000}min\`);
+  
+  let startTime = new Date().getTime();
+  unfollowedCount = 0;
+  skippedCount = 0;
+
+  // Setup keyboard listener to stop script
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      console.log("🛑 ESC key pressed - Stopping script...");
+      stopScript = true;
+    }
+  });
+  
+  // Display progress info periodically
+  const progressInterval = setInterval(() => {
+    if (stopScript) {
+      clearInterval(progressInterval);
+      return;
+    }
+    const elapsedMinutes = Math.floor((new Date().getTime() - startTime) / 60000);
+    console.log(\`📊 Progress: Unfollowed \${unfollowedCount}, Skipped \${skippedCount}, Running for \${elapsedMinutes} minutes\`);
+  }, 30000);
+
+  try {
+    while (new Date().getTime() - startTime < TOTAL_DURATION && !stopScript && unfollowedCount < UNFOLLOW_LIMIT) {
+      // Try to unfollow
+      const success = await unfollowSingle();
+      
+      if (success) {
+        unfollowedCount++;
+        console.log(\`✅ Unfollowed #\${unfollowedCount}\`);
+        await delay(UNFOLLOW_INTERVAL);
+      } else {
+        skippedCount++;
+        
+        // Try scrolling to load more if we can't find buttons
+        const loadedMore = await scrollToLoadMore();
+        if (!loadedMore) {
+          console.log("⚠️ No more accounts to unfollow or need to scroll down");
+          await delay(2000);
+        }
+      }
+      
+      // Take a break if needed
+      if (unfollowedCount > 0 && unfollowedCount % 50 === 0) {
+        const breakMinutes = BREAK_DURATION / 60000;
+        console.log(\`🕒 Taking a break for \${breakMinutes} minutes to avoid rate limits...\`);
+        await delay(BREAK_DURATION);
+        
+        if (!stopScript) {
+          console.log("▶️ Resuming unfollowing");
+        }
+      }
+    }
+  } catch (error) {
+    console.error("❌ Script error:", error);
+  } finally {
+    clearInterval(progressInterval);
+    
+    const totalElapsedMinutes = Math.floor((new Date().getTime() - startTime) / 60000);
+    console.log(\`
+🏁 Script finished:
+- Total unfollowed: \${unfollowedCount}
+- Total skipped: \${skippedCount}
+- Running time: \${totalElapsedMinutes} minutes
+- Status: \${stopScript ? 'Stopped by user' : 'Completed naturally'}
+    \`);
+  }
+};
+
+// Run the script
+unfollowUsers();
+
+// To stop the script, press ESC key or type stopScript = true in the console
+console.log("💡 Tip: Press ESC key or type stopScript = true in console to stop the script");`;
+
+        // Set up copy button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyBtn = document.getElementById('copyBtn');
+            const codeText = document.getElementById('codeText');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Set the text to be copied
+            codeText.value = instagramUnfollowScript;
+            
+            copyBtn.addEventListener('click', function() {
+                // Select the text
+                codeText.style.display = 'block';
+                codeText.select();
+                
+                try {
+                    // Copy the text
+                    document.execCommand('copy');
+                    
+                    // Show success message
+                    successMessage.style.display = 'block';
+                    
+                    // Hide success message after 3 seconds
+                    setTimeout(function() {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                } catch (err) {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy code. Please try again or copy it manually.');
+                }
+                
+                // Hide the textarea again
+                codeText.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
