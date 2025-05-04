@@ -50,7 +50,7 @@ const TOTAL_DURATION = 10 * 60 * 1000;   // 10 minutes total runtime
 
 ### Step 4: Run the Script
 
-1. Copy the entire script
+1. Copy the entire script from the main file
 2. Paste it into the browser console
 3. Press Enter to run
 
