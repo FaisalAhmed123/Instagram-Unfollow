@@ -2,9 +2,9 @@
 // Configuration
 const UNFOLLOW_LIMIT = 800;              // Maximum accounts to unfollow in one session
 const UNFOLLOW_INTERVAL = 1000;          // 1 second between unfollows to avoid detection
-const BREAK_DURATION = 5 * 60 * 1000;    // 5 minutes break
-const TOTAL_DURATION = 10 * 60 * 1000;   // 10 minutes duration
-const TIMEOUT_DURATION = 10000;          // 10 seconds timeout for waiting operations
+const BREAK_DURATION = 0.1 * 60 * 1000;    // 0.1 minutes break
+const TOTAL_DURATION = 20 * 60 * 1000;   // 20 minutes duration
+const TIMEOUT_DURATION = 1000;          // 1 seconds timeout for waiting operations
 
 // Control variables
 let stopScript = false;
